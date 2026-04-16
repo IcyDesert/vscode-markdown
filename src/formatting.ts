@@ -449,12 +449,10 @@ function styleByWrapping(startPattern: string, endPattern = startPattern) {
         } else {
             // Text selected
             const rangeToWrap = trimTrailingLineBreak(editor, selection);
-            if (rangeToWrap.end.isEqual(selection.end)) {
-                wrapRange(editor, batchEdit, shifts, newSelections, i, shift, cursorPos, rangeToWrap, true, startPattern, endPattern);
-            } else {
+            if (!rangeToWrap.end.isEqual(selection.end)) {
                 newSelections[i] = new Selection(selection.start, rangeToWrap.end);
-                wrapRange(editor, batchEdit, shifts, newSelections, i, shift, cursorPos, rangeToWrap, true, startPattern, endPattern);
             }
+            wrapRange(editor, batchEdit, shifts, newSelections, i, shift, cursorPos, rangeToWrap, true, startPattern, endPattern);
         }
     }
 
