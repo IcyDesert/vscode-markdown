@@ -532,16 +532,19 @@ function wrapRange(editor: TextEditor, wsEdit: WorkspaceEdit, shifts: [Position,
 }
 
 function trimTrailingLineBreak(editor: TextEditor, range: Range): Range {
-    const startOffset = editor.document.offsetAt(range.start);
-    const endOffset = editor.document.offsetAt(range.end);
+    const doc = editor.document;
+    const startOffset = doc.offsetAt(range.start);
+    const endOffset = doc.offsetAt(range.end);
     if (endOffset <= startOffset) {
         return range;
     }
 
+    const tailStartOffset = Math.max(startOffset, endOffset - 2);
+    const tail = doc.getText(new Range(doc.positionAt(tailStartOffset), range.end));
     let trimmedLength = 0;
-    if (endOffset - startOffset >= 2 && editor.document.getText(new Range(editor.document.positionAt(endOffset - 2), range.end)) === '\r\n') {
+    if (tail.endsWith('\r\n')) {
         trimmedLength = 2;
-    } else if (editor.document.getText(new Range(editor.document.positionAt(endOffset - 1), range.end)) === '\n') {
+    } else if (tail.endsWith('\n')) {
         trimmedLength = 1;
     }
 
@@ -549,7 +552,7 @@ function trimTrailingLineBreak(editor: TextEditor, range: Range): Range {
         return range;
     }
 
-    return new Range(range.start, editor.document.positionAt(endOffset - trimmedLength));
+    return new Range(range.start, doc.positionAt(endOffset - trimmedLength));
 }
 
 function isWrapped(text: string, startPattern: string, endPattern: string): boolean {
