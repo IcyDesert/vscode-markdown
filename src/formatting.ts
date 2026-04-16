@@ -539,7 +539,7 @@ function trimTrailingLineBreak(editor: TextEditor, range: Range): Range {
         return range;
     }
 
-    const tailStartOffset = Math.max(startOffset, endOffset - 2);
+    const tailStartOffset = endOffset - startOffset < 2 ? startOffset : endOffset - 2;
     const tail = doc.getText(new Range(doc.positionAt(tailStartOffset), range.end));
     let trimmedLength = 0;
     if (tail.endsWith('\r\n')) {
