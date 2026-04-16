@@ -448,7 +448,13 @@ function styleByWrapping(startPattern: string, endPattern = startPattern) {
             }
         } else {
             // Text selected
-            wrapRange(editor, batchEdit, shifts, newSelections, i, shift, cursorPos, selection, true, startPattern, endPattern);
+            const rangeToWrap = trimTrailingLineBreak(editor, selection);
+            if (rangeToWrap.end.isEqual(selection.end)) {
+                wrapRange(editor, batchEdit, shifts, newSelections, i, shift, cursorPos, rangeToWrap, true, startPattern, endPattern);
+            } else {
+                newSelections[i] = new Selection(selection.start, rangeToWrap.end);
+                wrapRange(editor, batchEdit, shifts, newSelections, i, shift, cursorPos, rangeToWrap, true, startPattern, endPattern);
+            }
         }
     }
 
@@ -525,6 +531,21 @@ function wrapRange(editor: TextEditor, wsEdit: WorkspaceEdit, shifts: [Position,
     }
 
     newSelections[i] = newSelection;
+}
+
+function trimTrailingLineBreak(editor: TextEditor, range: Range): Range {
+    const text = editor.document.getText(range);
+    let trimmedLength = 0;
+    if (text.endsWith('\r\n')) {
+        trimmedLength = 2;
+    } else if (text.endsWith('\n')) {
+        trimmedLength = 1;
+    }
+    if (trimmedLength === 0) {
+        return range;
+    }
+    const endOffset = editor.document.offsetAt(range.end) - trimmedLength;
+    return new Range(range.start, editor.document.positionAt(endOffset));
 }
 
 function isWrapped(text: string, startPattern: string, endPattern: string): boolean {
