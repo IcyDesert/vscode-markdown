@@ -24,6 +24,7 @@ export function activate(context: ExtensionContext) {
  * Here we store Regexp to check if the text is the single link.
  */
 const singleLinkRegex: RegExp = createLinkRegex();
+const MAX_LINE_BREAK_LENGTH = 2;
 
 // Return Promise because need to chain operations in unit tests
 
@@ -539,7 +540,7 @@ function trimTrailingLineBreak(editor: TextEditor, range: Range): Range {
         return range;
     }
 
-    const tailStartOffset = endOffset - startOffset < 2 ? startOffset : endOffset - 2;
+    const tailStartOffset = endOffset - startOffset < MAX_LINE_BREAK_LENGTH ? startOffset : endOffset - MAX_LINE_BREAK_LENGTH;
     const tail = doc.getText(new Range(doc.positionAt(tailStartOffset), range.end));
     let trimmedLength = 0;
     if (tail.endsWith('\r\n')) {
