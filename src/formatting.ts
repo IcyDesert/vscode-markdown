@@ -532,6 +532,16 @@ function wrapRange(editor: TextEditor, wsEdit: WorkspaceEdit, shifts: [Position,
     newSelections[i] = newSelection;
 }
 
+
+/**
+ * Trims any trailing line breaks from the given range.
+ * If the range ends with a carriage return and line feed (\r\n) or a line feed (\n),
+ * a new Range is returned with these characters excluded from the end.
+ * 
+ * @param editor The text editor containing the document.
+ * @param range The range to be trimmed.
+ * @returns A new Range without trailing line breaks, or the original range if none are found.
+ */
 function trimTrailingLineBreak(editor: TextEditor, range: Range): Range {
     const doc = editor.document;
     const startOffset = doc.offsetAt(range.start);
